@@ -79,7 +79,7 @@
   .card h2{margin:0 0 4px;font-size:16px;font-weight:800;letter-spacing:-.2px}
   .card .hint{margin:0 0 14px;font-size:13px;color:var(--muted)}
   label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
-  input[type=text],input[type=number],select,textarea{
+  input[type=text],input[type=number],input[type=password],select,textarea{
     width:100%;padding:10px 13px;border:1.5px solid var(--line);border-radius:12px;
     font-size:14px;font-family:inherit;background:#fbfdfc;color:var(--ink)
   }
@@ -134,6 +134,7 @@
   /* bottom nav (mobile) */
   .bottom-nav{display:none}
   /* ===== MOBILE ===== */
+  @media (max-width:600px){ .hero svg.illus{display:none} .hero p{max-width:100%} }
   @media (max-width:860px){
     body{padding:0;background:var(--panel)}
     .app{border-radius:0;min-height:100vh;box-shadow:none}
@@ -167,7 +168,7 @@
   .nav-item.active{transform:none}
   .card{transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
   .card:hover{box-shadow:0 12px 30px rgba(13,50,44,.09)}
-  input[type=text],input[type=number],select,textarea{transition:border-color .25s var(--ease),box-shadow .25s var(--ease),background-color .25s var(--ease)}
+  input[type=text],input[type=number],input[type=password],select,textarea{transition:border-color .25s var(--ease),box-shadow .25s var(--ease),background-color .25s var(--ease)}
   tbody tr{transition:background-color .25s var(--ease)}
   tbody tr:hover td{background:#f6faf8}
   .row-pending:hover td{background:#fdf9e2}
@@ -354,14 +355,16 @@
         </div>
 
         <div class="card">
-          <h2>🔑 Kode Guru</h2>
-          <p class="hint">Masukkan kode ini di HP atau laptop lain supaya datanya sama. Jangan dibagikan ke orang lain.</p>
+          <h2>👤 Akun</h2>
+          <p class="hint">Masuk dengan nama & password yang sama di HP atau laptop lain supaya datanya sama.</p>
           <div class="flex-between" style="background:var(--lime-soft);border:1px solid #dcecad;border-radius:14px;padding:14px 16px">
-            <div><div class="mini">Kode Anda</div><div id="kode-tampil" style="font-size:22px;font-weight:800;letter-spacing:1.5px">—</div></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn-lime" onclick="salinKode()">📋 Salin Kode</button>
-              <button class="btn-ghost" onclick="keluarPerangkat()">Keluar dari perangkat ini</button>
-            </div>
+            <div><div class="mini">Masuk sebagai</div><div id="kode-tampil" style="font-size:20px;font-weight:800">—</div></div>
+            <button class="btn-ghost" onclick="keluarPerangkat()">Keluar dari perangkat ini</button>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-ghost" onclick="unduhCadangan()">⬇️ Unduh Cadangan</button>
+            <button class="btn-ghost" onclick="$('file-cadangan').click()">📂 Pulihkan dari Cadangan</button>
+            <input type="file" id="file-cadangan" accept=".json,application/json" style="display:none" onchange="pulihkanCadangan(this)">
           </div>
         </div>
 
@@ -464,29 +467,34 @@
 </dialog>
 
 
-<dialog id="welcome-dialog" style="max-width:440px" oncancel="event.preventDefault()">
-  <div style="text-align:center;margin-bottom:6px">
+<dialog id="welcome-dialog" style="max-width:420px" oncancel="event.preventDefault()">
+  <style>
+    .wl-tabs{display:flex;background:#eef3f0;border-radius:999px;padding:4px;margin:14px 0 14px}
+    .wl-tab{flex:1;background:none;color:var(--muted);padding:9px 10px}
+    .wl-tab.active{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(13,50,44,.12)}
+    #welcome-dialog label{margin-top:10px}
+  </style>
+  <div style="text-align:center">
     <div style="width:56px;height:56px;border-radius:16px;background:var(--side);display:grid;place-items:center;margin:0 auto 10px;font-size:26px">📝</div>
     <h2 style="margin:0;font-size:20px;font-weight:800">Selamat datang di NilaiCepat</h2>
   </div>
-  <div id="wl-pilih">
-    <p class="mini" style="text-align:center;margin:4px 0 16px">Koreksi PG & Benar/Salah otomatis, rekap nilai langsung jadi.</p>
-    <button class="btn-primary" style="width:100%;margin-bottom:8px" onclick="mulaiGuruBaru()">Saya guru baru</button>
-    <button class="btn-ghost" style="width:100%" onclick="welcomeStep('wl-lama')">Saya sudah punya kode</button>
+  <div class="wl-tabs">
+    <button class="wl-tab active" data-step="wl-masuk" onclick="welcomeStep('wl-masuk')">Masuk</button>
+    <button class="wl-tab" data-step="wl-daftar" onclick="welcomeStep('wl-daftar')">Guru baru</button>
   </div>
-  <div id="wl-baru" class="hidden">
-    <p class="mini" style="text-align:center;margin:4px 0 10px">Ini kode Anda. <b>Catat atau foto</b> — dipakai untuk membuka data yang sama di HP atau laptop lain.</p>
-    <div id="wl-kode-baru" style="text-align:center;font-size:26px;font-weight:800;letter-spacing:2px;background:var(--lime-soft);border:1px solid #dcecad;border-radius:14px;padding:14px;margin-bottom:12px">—</div>
-    <button class="btn-ghost" style="width:100%;margin-bottom:8px" onclick="salinKode()">📋 Salin Kode</button>
-    <button class="btn-primary" style="width:100%" onclick="selesaiWelcome()">Sudah dicatat, mulai</button>
+  <div id="wl-masuk">
+    <label>Nama</label><input type="text" id="wl-nama" autocomplete="username" placeholder="cth: Dendy">
+    <label>Password</label><input type="password" id="wl-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')masukAkun()">
+    <button class="btn-primary" style="width:100%;margin-top:16px" onclick="masukAkun()">Masuk</button>
   </div>
-  <div id="wl-lama" class="hidden">
-    <p class="mini" style="text-align:center;margin:4px 0 10px">Masukkan kode yang Anda dapat waktu pertama kali memakai aplikasi ini.</p>
-    <input type="text" id="wl-input" class="answer-input" style="text-align:center;letter-spacing:2px;font-size:18px" placeholder="QN-XXXX-XXXX" onkeydown="if(event.key==='Enter')masukDenganKode()">
-    <div id="wl-err" class="mini" style="color:var(--red);min-height:18px;margin:6px 0;text-align:center"></div>
-    <button class="btn-primary" style="width:100%;margin-bottom:8px" onclick="masukDenganKode()">Masuk</button>
-    <button class="btn-ghost" style="width:100%" onclick="welcomeStep('wl-pilih')">Kembali</button>
+  <div id="wl-daftar" class="hidden">
+    <label>Nama</label><input type="text" id="wd-nama" autocomplete="username" placeholder="cth: Dendy">
+    <label>Password <span style="font-weight:500">(minimal 6 karakter)</span></label><input type="password" id="wd-pass" autocomplete="new-password">
+    <label>Ulangi password</label><input type="password" id="wd-pass2" autocomplete="new-password" onkeydown="if(event.key==='Enter')daftarAkun()">
+    <button class="btn-primary" style="width:100%;margin-top:16px" onclick="daftarAkun()">Daftar & mulai</button>
+    <p class="mini" style="margin:10px 0 0;text-align:center">Ingat baik-baik password Anda — tidak bisa dipulihkan.</p>
   </div>
+  <div id="wl-err" class="mini" style="color:var(--red);min-height:18px;margin-top:10px;text-align:center"></div>
 </dialog>
 
 <div class="toast" id="toast"></div>
@@ -516,7 +524,8 @@ let sb=null, syncTimer=null, lastSynced='', cloudState='off'; // off|ok|err|savi
 let cfg={url:'',key:'',kode:''};
 try{const c=JSON.parse(localStorage.getItem(CFG_KEY)||'{}');cfg={...cfg,...c};}catch(e){}
 cfg.url=SUPABASE_URL_DEFAULT; cfg.key=SUPABASE_KEY_DEFAULT; // selalu pakai koneksi bawaan
-if(cfg.kode&&cfg.kode.length<8)cfg.kode=''; // kode lama yang terlalu pendek: minta masuk ulang
+if(cfg.kode&&!cfg.kode.startsWith('u_'))cfg.kode=''; // format lama: minta masuk dengan nama & password
+const hadLocalData=(()=>{try{return !!localStorage.getItem(LS_KEY);}catch(e){return false;}})();
 function saveCfg(){try{localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}catch(e){}}
 
 function setSync(mode,msg){
@@ -533,7 +542,7 @@ function setSync(mode,msg){
     hero.style.color=mode==='err'?'#b97d10':'inherit';
   }
   const kd=document.getElementById('kode-tampil');
-  if(kd)kd.textContent=cfg.kode||'—';
+  if(kd)kd.textContent=cfg.nama||'—';
   if(msg)toast(msg);
 }
 function client(){
@@ -588,14 +597,13 @@ async function connectCloud(){
   }catch(e){setSync('err');}
 }
 
-/* ---------- layar sambutan: masuk dengan kode ---------- */
-function genKode(){
-  const abc='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const b=new Uint8Array(8); crypto.getRandomValues(b);
-  const s=[...b].map(x=>abc[x%abc.length]).join('');
-  return 'QN-'+s.slice(0,4)+'-'+s.slice(4);
+/* ---------- masuk dengan nama + password ---------- */
+function normNama(v){return String(v||'').trim().replace(/\s+/g,' ');}
+async function akunKey(nama,pass){
+  const raw='nilaicepat|'+normNama(nama).toLowerCase()+'|'+pass;
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw));
+  return 'u_'+[...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,40);
 }
-function normKode(v){return String(v||'').trim().toUpperCase().replace(/\s+/g,'-');}
 function blankState(){
   return {meta:{mapel:'',ujian:'',kkm:75},
     pg:{count:25,options:4,weight:50,key:[]},
@@ -604,51 +612,87 @@ function blankState(){
     classes:[{name:'Kelas 1',students:[]}],active:0,editIndex:-1,savedAt:Date.now()};
 }
 function welcomeStep(step){
-  ['wl-pilih','wl-baru','wl-lama'].forEach(id=>$(id).classList.toggle('hidden',id!==step));
-  if(step==='wl-lama')setTimeout(()=>$('wl-input').focus(),50);
+  ['wl-masuk','wl-daftar'].forEach(id=>$(id).classList.toggle('hidden',id!==step));
+  document.querySelectorAll('.wl-tab').forEach(t=>t.classList.toggle('active',t.dataset.step===step));
+  $('wl-err').textContent='';
+  setTimeout(()=>$(step==='wl-masuk'?'wl-nama':'wd-nama').focus(),50);
 }
 function openWelcome(){
   const d=$('welcome-dialog'); if(!d)return;
-  welcomeStep('wl-pilih'); $('wl-err').textContent='';
+  welcomeStep(hadLocalData?'wl-daftar':'wl-masuk');
   if(!d.open)d.showModal();
 }
-async function mulaiGuruBaru(){
-  const kode=genKode();
-  const localHas=state.classes.some(c=>c.students.length);
-  if(!localHas){state={...state,...blankState()};}
-  cfg.kode=kode; saveCfg(); lastSynced='';
-  $('wl-kode-baru').textContent=kode;
-  welcomeStep('wl-baru');
-  refreshUI();
-  try{state.savedAt=Date.now();await pushCloud();}catch(e){}
-}
-async function masukDenganKode(){
-  const kode=normKode($('wl-input').value);
+function busy(on){document.querySelectorAll('#welcome-dialog button').forEach(b=>b.disabled=on);}
+async function daftarAkun(){
   const err=$('wl-err');
-  if(kode.length<8){err.textContent='Kode minimal 8 karakter.';return;}
-  err.textContent='Memeriksa kode…';
+  const nama=normNama($('wd-nama').value), p1=$('wd-pass').value, p2=$('wd-pass2').value;
+  if(nama.length<3){err.textContent='Nama minimal 3 huruf.';return;}
+  if(p1.length<6){err.textContent='Password minimal 6 karakter.';return;}
+  if(p1!==p2){err.textContent='Ulangi password belum sama.';return;}
+  err.textContent='Mendaftarkan…'; busy(true);
   try{
-    const d=await fetchCloud(kode);
-    if(!d||!d.classes){err.textContent='Kode tidak ditemukan. Cek lagi ejaannya.';return;}
-    cfg.kode=kode; saveCfg();
+    const key=await akunKey(nama,p1);
+    const ada=await fetchCloud(key);
+    if(ada&&ada.classes){busy(false);err.textContent='Nama & password ini sudah terdaftar. Pakai tab "Masuk".';return;}
+    if(!hadLocalData){state={...state,...blankState()};}
+    cfg.kode=key; cfg.nama=nama; saveCfg(); lastSynced='';
+    state.savedAt=Date.now();
+    refreshUI(); await pushCloud();
+    busy(false);
+    if(cloudState!=='ok'){err.textContent='Tidak bisa terhubung. Cek koneksi internet lalu coba lagi.';cfg.kode='';saveCfg();return;}
+    $('welcome-dialog').close(); showTab('setup');
+    toast('Selamat datang, '+nama+' ✓');
+  }catch(e){busy(false);err.textContent='Tidak bisa terhubung. Cek koneksi internet lalu coba lagi.';}
+}
+async function masukAkun(){
+  const err=$('wl-err');
+  const nama=normNama($('wl-nama').value), pass=$('wl-pass').value;
+  if(!nama||!pass){err.textContent='Isi nama dan password.';return;}
+  err.textContent='Memeriksa…'; busy(true);
+  try{
+    const key=await akunKey(nama,pass);
+    const d=await fetchCloud(key);
+    busy(false);
+    if(!d||!d.classes){err.textContent='Nama atau password salah.';return;}
+    cfg.kode=key; cfg.nama=nama; saveCfg();
     applyCloudState(d);
     lastSynced=JSON.stringify({...snapshotPayload(),savedAt:0});
-    refreshUI(); setSync('ok','Data dimuat ✓');
+    refreshUI(); setSync('ok');
     $('welcome-dialog').close();
-  }catch(e){err.textContent='Tidak bisa terhubung. Cek koneksi internet lalu coba lagi.';}
-}
-function selesaiWelcome(){ $('welcome-dialog').close(); setSync(cloudState==='err'?'err':'ok'); showTab('setup'); }
-function salinKode(){
-  const k=cfg.kode; if(!k)return;
-  (navigator.clipboard?navigator.clipboard.writeText(k):Promise.reject()).then(()=>toast('Kode disalin ✓')).catch(()=>toast('Kode: '+k));
+    toast('Selamat datang kembali, '+nama+' ✓');
+  }catch(e){busy(false);err.textContent='Tidak bisa terhubung. Cek koneksi internet lalu coba lagi.';}
 }
 async function keluarPerangkat(){
   if(!cfg.kode){openWelcome();return;}
-  if(!confirm('Keluar dari perangkat ini?\nData di perangkat ini dihapus, tapi tetap aman di cloud. Masuk lagi kapan saja dengan kode '+cfg.kode+'.'))return;
+  if(!confirm('Keluar dari perangkat ini?\nData di perangkat ini dihapus, tapi tetap aman di cloud. Masuk lagi kapan saja dengan nama & password Anda.'))return;
   clearTimeout(syncTimer); await pushCloud();
-  cfg.kode=''; saveCfg();
+  cfg.kode=''; cfg.nama=''; saveCfg();
   try{localStorage.removeItem(LS_KEY);}catch(e){}
   location.reload();
+}
+
+/* ---------- cadangan (.json) ---------- */
+function unduhCadangan(){
+  const d={app:'nilaicepat',versi:1,...snapshotPayload()};
+  const blob=new Blob([JSON.stringify(d)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='cadangan-nilaicepat-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();URL.revokeObjectURL(a.href);toast('Cadangan terunduh ✓');
+}
+function pulihkanCadangan(inp){
+  const f=inp.files&&inp.files[0]; inp.value=''; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    let d; try{d=JSON.parse(r.result);}catch(e){toast('File cadangan tidak bisa dibaca');return;}
+    if(!d||!Array.isArray(d.classes)||!d.pg){toast('Ini bukan file cadangan NilaiCepat');return;}
+    const jml=d.classes.reduce((a,c)=>a+(c.students||[]).length,0);
+    if(!confirm('Pulihkan '+d.classes.length+' kelas ('+jml+' siswa) beserta kunci jawabannya?\nData yang sekarang tampil akan diganti.'))return;
+    state={...state,meta:d.meta||state.meta,pg:d.pg,bs:d.bs||state.bs,essay:d.essay||state.essay,
+      classes:d.classes.length?d.classes:state.classes,active:0,editIndex:-1};
+    save(); refreshUI(); showTab('input');
+    toast('Data dipulihkan ✓');
+  };
+  r.readAsText(f);
 }
 function load(){
   try{
