@@ -230,7 +230,7 @@
     <div class="group">Umum</div>
     <button class="nav-item" onclick="exportCSV(true)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Unduh Semua (CSV)</button>
+      Unduh Semua (Excel)</button>
     <button class="nav-item" onclick="window.print()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       Cetak</button>
@@ -354,18 +354,15 @@
         </div>
 
         <div class="card">
-          <h2>☁️ Sinkronisasi Antar Perangkat</h2>
-          <p class="hint">Isi sekali per perangkat. Pakai <b>kode sinkronisasi yang sama</b> di HP & laptop supaya datanya nyambung. Guru lain pakai kode berbeda → data terpisah.</p>
-          <div class="row">
-            <div style="flex:2;min-width:220px"><label>URL Proyek Supabase</label><input type="text" id="cfg-url" placeholder="https://xxxx.supabase.co"></div>
-            <div style="flex:3;min-width:260px"><label>Kunci Publik (anon key)</label><input type="text" id="cfg-key" placeholder="eyJhbGciOi..."></div>
-            <div style="flex:1.5;min-width:170px"><label>Kode Sinkronisasi</label><input type="text" id="cfg-kode" class="answer-input" style="letter-spacing:1px" placeholder="otomatis jika kosong"></div>
+          <h2>🔑 Kode Guru</h2>
+          <p class="hint">Masukkan kode ini di HP atau laptop lain supaya datanya sama. Jangan dibagikan ke orang lain.</p>
+          <div class="flex-between" style="background:var(--lime-soft);border:1px solid #dcecad;border-radius:14px;padding:14px 16px">
+            <div><div class="mini">Kode Anda</div><div id="kode-tampil" style="font-size:22px;font-weight:800;letter-spacing:1.5px">—</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn-lime" onclick="salinKode()">📋 Salin Kode</button>
+              <button class="btn-ghost" onclick="keluarPerangkat()">Keluar dari perangkat ini</button>
+            </div>
           </div>
-          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn-lime" onclick="saveCloudCfg()">🔗 Hubungkan & Sinkron</button>
-            <button class="btn-ghost" onclick="disconnectCloud()">Putuskan</button>
-          </div>
-          <p class="mini" style="margin:10px 0 0">💡 Simpan kode sinkronisasi lu baik-baik — itu "kunci" data lu. Jangan dibagikan ke orang lain.</p>
         </div>
 
         <div class="flex-between">
@@ -422,8 +419,8 @@
           <div class="flex-between">
             <div><b id="rekap-title">Rekap Nilai</b><div class="mini" id="rekap-sub"></div></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn-lime" onclick="exportCSV(false)">⬇️ CSV Kelas Ini</button>
-              <button class="btn-primary" onclick="exportCSV(true)">⬇️ CSV Semua Kelas</button>
+              <button class="btn-lime" onclick="exportCSV(false)">⬇️ Excel Kelas Ini</button>
+              <button class="btn-primary" onclick="exportCSV(true)">⬇️ Excel Semua Kelas</button>
               <button class="btn-ghost" onclick="window.print()">🖨️ Cetak</button>
             </div>
           </div>
@@ -466,6 +463,32 @@
   </div>
 </dialog>
 
+
+<dialog id="welcome-dialog" style="max-width:440px" oncancel="event.preventDefault()">
+  <div style="text-align:center;margin-bottom:6px">
+    <div style="width:56px;height:56px;border-radius:16px;background:var(--side);display:grid;place-items:center;margin:0 auto 10px;font-size:26px">📝</div>
+    <h2 style="margin:0;font-size:20px;font-weight:800">Selamat datang di NilaiCepat</h2>
+  </div>
+  <div id="wl-pilih">
+    <p class="mini" style="text-align:center;margin:4px 0 16px">Koreksi PG & Benar/Salah otomatis, rekap nilai langsung jadi.</p>
+    <button class="btn-primary" style="width:100%;margin-bottom:8px" onclick="mulaiGuruBaru()">Saya guru baru</button>
+    <button class="btn-ghost" style="width:100%" onclick="welcomeStep('wl-lama')">Saya sudah punya kode</button>
+  </div>
+  <div id="wl-baru" class="hidden">
+    <p class="mini" style="text-align:center;margin:4px 0 10px">Ini kode Anda. <b>Catat atau foto</b> — dipakai untuk membuka data yang sama di HP atau laptop lain.</p>
+    <div id="wl-kode-baru" style="text-align:center;font-size:26px;font-weight:800;letter-spacing:2px;background:var(--lime-soft);border:1px solid #dcecad;border-radius:14px;padding:14px;margin-bottom:12px">—</div>
+    <button class="btn-ghost" style="width:100%;margin-bottom:8px" onclick="salinKode()">📋 Salin Kode</button>
+    <button class="btn-primary" style="width:100%" onclick="selesaiWelcome()">Sudah dicatat, mulai</button>
+  </div>
+  <div id="wl-lama" class="hidden">
+    <p class="mini" style="text-align:center;margin:4px 0 10px">Masukkan kode yang Anda dapat waktu pertama kali memakai aplikasi ini.</p>
+    <input type="text" id="wl-input" class="answer-input" style="text-align:center;letter-spacing:2px;font-size:18px" placeholder="QN-XXXX-XXXX" onkeydown="if(event.key==='Enter')masukDenganKode()">
+    <div id="wl-err" class="mini" style="color:var(--red);min-height:18px;margin:6px 0;text-align:center"></div>
+    <button class="btn-primary" style="width:100%;margin-bottom:8px" onclick="masukDenganKode()">Masuk</button>
+    <button class="btn-ghost" style="width:100%" onclick="welcomeStep('wl-pilih')">Kembali</button>
+  </div>
+</dialog>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -483,22 +506,22 @@ let state={
   editIndex:-1
 };
 
-/* ---------- persistence: lokal + Supabase ---------- */
-/* Opsional: isi dua baris di bawah agar semua perangkat otomatis terhubung
-   tanpa mengisi form koneksi. Ambil dari Supabase: Settings → API. */
-const SUPABASE_URL_DEFAULT='';
-const SUPABASE_KEY_DEFAULT='';
+/* ---------- persistence: lokal + Supabase (per kode guru) ---------- */
+/* Koneksi Supabase ditanam di sini supaya guru cukup memasukkan kode. */
+const SUPABASE_URL_DEFAULT='https://hvolbapjobnbweczuavt.supabase.co';
+const SUPABASE_KEY_DEFAULT='sb_publishable_GpLk191vKFjOeoHFjHGqTw_QzaC3zhE';
 
 const CFG_KEY='penilaian-cloud-cfg';
 let sb=null, syncTimer=null, lastSynced='', cloudState='off'; // off|ok|err|saving
 let cfg={url:'',key:'',kode:''};
 try{const c=JSON.parse(localStorage.getItem(CFG_KEY)||'{}');cfg={...cfg,...c};}catch(e){}
-if(!cfg.url&&SUPABASE_URL_DEFAULT)cfg.url=SUPABASE_URL_DEFAULT;
-if(!cfg.key&&SUPABASE_KEY_DEFAULT)cfg.key=SUPABASE_KEY_DEFAULT;
+cfg.url=SUPABASE_URL_DEFAULT; cfg.key=SUPABASE_KEY_DEFAULT; // selalu pakai koneksi bawaan
+if(cfg.kode&&cfg.kode.length<8)cfg.kode=''; // kode lama yang terlalu pendek: minta masuk ulang
+function saveCfg(){try{localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}catch(e){}}
 
 function setSync(mode,msg){
   cloudState=mode;
-  const texts={ok:'☁️ Tersinkron · kode: '+(cfg.kode||'-'),saving:'☁️ Menyimpan…',err:'⚠️ Belum tersinkron',off:'💾 Hanya di perangkat ini'};
+  const texts={ok:'☁️ Tersinkron',saving:'☁️ Menyimpan…',err:'⚠️ Belum tersinkron',off:'💾 Belum masuk'};
   const side=document.getElementById('sync-status');
   if(side){
     side.textContent=texts[mode]||texts.off;
@@ -506,81 +529,126 @@ function setSync(mode,msg){
   }
   const hero=document.getElementById('sync-status-hero');
   if(hero){
-    hero.textContent=(texts[mode]||texts.off).split(' · ')[0];
+    hero.textContent=texts[mode]||texts.off;
     hero.style.color=mode==='err'?'#b97d10':'inherit';
   }
+  const kd=document.getElementById('kode-tampil');
+  if(kd)kd.textContent=cfg.kode||'—';
   if(msg)toast(msg);
 }
+function client(){
+  if(sb)return sb;
+  if(!window.supabase)throw new Error('lib');
+  sb=window.supabase.createClient(cfg.url,cfg.key);
+  return sb;
+}
 function snapshotPayload(){
-  return {meta:state.meta,pg:state.pg,bs:state.bs,essay:state.essay,classes:state.classes,active:state.active,savedAt:Date.now()};
+  return {meta:state.meta,pg:state.pg,bs:state.bs,essay:state.essay,classes:state.classes,active:state.active,savedAt:state.savedAt||Date.now()};
 }
 function save(){
   state.savedAt=Date.now();
   try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}
-  if(sb){clearTimeout(syncTimer);syncTimer=setTimeout(pushCloud,1500);}
+  if(cfg.kode){clearTimeout(syncTimer);syncTimer=setTimeout(pushCloud,1500);}
 }
 async function pushCloud(){
-  if(!sb||!cfg.kode)return;
+  if(!cfg.kode)return;
   const payload=snapshotPayload();
   const str=JSON.stringify({...payload,savedAt:0});
   if(str===lastSynced)return;
   setSync('saving');
   try{
-    const {error}=await sb.from('sinkron_nilai').upsert({kode:cfg.kode,data:payload,updated_at:new Date().toISOString()});
+    const {error}=await client().rpc('simpan_data',{p_kode:cfg.kode,p_data:payload});
     if(error)throw error;
     lastSynced=str; setSync('ok');
   }catch(e){setSync('err');}
+}
+async function fetchCloud(kode){
+  const {data,error}=await client().rpc('ambil_data',{p_kode:kode});
+  if(error)throw error;
+  return data||null;
 }
 function applyCloudState(d){
   state={...state,
     meta:d.meta||state.meta,pg:d.pg||state.pg,bs:d.bs||state.bs,essay:d.essay||state.essay,
     classes:(d.classes&&d.classes.length)?d.classes:state.classes,
-    active:Math.min(d.active||0,(d.classes?.length||1)-1),editIndex:-1};
+    active:Math.min(d.active||0,(d.classes?.length||1)-1),savedAt:d.savedAt||0,editIndex:-1};
   try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}
 }
-async function connectCloud(interactive){
-  if(!cfg.url||!cfg.key||!cfg.kode){setSync('off');return;}
-  if(!window.supabase){setSync('err');if(interactive)toast('Pustaka Supabase belum termuat — cek koneksi internet');return;}
+async function connectCloud(){
+  if(!cfg.kode){setSync('off');openWelcome();return;}
   try{
-    if(!sb) sb=window.supabase.createClient(cfg.url,cfg.key);
-    const {data,error}=await sb.from('sinkron_nilai').select('data').eq('kode',cfg.kode).maybeSingle();
-    if(error)throw error;
-    const d=data&&data.data;
-    const localHas=state.classes.some(c=>c.students.length);
-    if(d&&d.classes&&d.classes.length){
-      const cloudNewer=(d.savedAt||0)>=(getLocalSavedAt());
-      if(cloudNewer||!localHas){
-        applyCloudState(d);
-        lastSynced=JSON.stringify({...snapshotPayload(),savedAt:0});
-        refreshUI();
-        setSync('ok',interactive?'☁️ Terhubung — data dimuat dari cloud ✓':null);
-      }else{
-        setSync('ok',interactive?'☁️ Terhubung — data perangkat ini lebih baru, akan disinkron':null);
-        save();
-      }
+    const d=await fetchCloud(cfg.kode);
+    if(d&&d.classes&&d.classes.length&&(d.savedAt||0)>=(state.savedAt||0)){
+      applyCloudState(d);
+      lastSynced=JSON.stringify({...snapshotPayload(),savedAt:0});
+      refreshUI(); setSync('ok');
     }else{
-      setSync('ok');
-      await pushCloud();
-      if(cloudState==='ok'&&interactive)toast('☁️ Terhubung — data dikirim ke cloud ✓');
+      setSync('ok'); await pushCloud();
     }
-  }catch(e){setSync('err');if(interactive)toast('Gagal terhubung — cek URL, kunci, dan tabel Supabase');}
+  }catch(e){setSync('err');}
 }
-function getLocalSavedAt(){return state.savedAt||0;}
-function saveCloudCfg(){
-  const url=$('cfg-url').value.trim().replace(/\/+$/,'');
-  const key=$('cfg-key').value.trim();
-  let kode=$('cfg-kode').value.trim().toUpperCase().replace(/\s+/g,'-');
-  if(!url||!key){toast('Isi URL dan kunci (anon key) Supabase dulu');return;}
-  if(!kode){kode='GURU-'+Math.random().toString(36).slice(2,8).toUpperCase();$('cfg-kode').value=kode;}
-  cfg={url,key,kode}; sb=null;
-  try{localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}catch(e){}
-  connectCloud(true);
+
+/* ---------- layar sambutan: masuk dengan kode ---------- */
+function genKode(){
+  const abc='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const b=new Uint8Array(8); crypto.getRandomValues(b);
+  const s=[...b].map(x=>abc[x%abc.length]).join('');
+  return 'QN-'+s.slice(0,4)+'-'+s.slice(4);
 }
-function disconnectCloud(){
-  if(!confirm('Putuskan sinkronisasi di perangkat ini? Data tetap aman di cloud & perangkat.'))return;
-  cfg={...cfg,kode:''}; sb=null;
-  try{localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}catch(e){}
-  setSync('off','Sinkronisasi diputus');
+function normKode(v){return String(v||'').trim().toUpperCase().replace(/\s+/g,'-');}
+function blankState(){
+  return {meta:{mapel:'',ujian:'',kkm:75},
+    pg:{count:25,options:4,weight:50,key:[]},
+    bs:{count:10,weight:20,key:[]},
+    essay:{count:5,max:[10,10,10,10,10]},
+    classes:[{name:'Kelas 1',students:[]}],active:0,editIndex:-1,savedAt:Date.now()};
+}
+function welcomeStep(step){
+  ['wl-pilih','wl-baru','wl-lama'].forEach(id=>$(id).classList.toggle('hidden',id!==step));
+  if(step==='wl-lama')setTimeout(()=>$('wl-input').focus(),50);
+}
+function openWelcome(){
+  const d=$('welcome-dialog'); if(!d)return;
+  welcomeStep('wl-pilih'); $('wl-err').textContent='';
+  if(!d.open)d.showModal();
+}
+async function mulaiGuruBaru(){
+  const kode=genKode();
+  const localHas=state.classes.some(c=>c.students.length);
+  if(!localHas){state={...state,...blankState()};}
+  cfg.kode=kode; saveCfg(); lastSynced='';
+  $('wl-kode-baru').textContent=kode;
+  welcomeStep('wl-baru');
+  refreshUI();
+  try{state.savedAt=Date.now();await pushCloud();}catch(e){}
+}
+async function masukDenganKode(){
+  const kode=normKode($('wl-input').value);
+  const err=$('wl-err');
+  if(kode.length<8){err.textContent='Kode minimal 8 karakter.';return;}
+  err.textContent='Memeriksa kode…';
+  try{
+    const d=await fetchCloud(kode);
+    if(!d||!d.classes){err.textContent='Kode tidak ditemukan. Cek lagi ejaannya.';return;}
+    cfg.kode=kode; saveCfg();
+    applyCloudState(d);
+    lastSynced=JSON.stringify({...snapshotPayload(),savedAt:0});
+    refreshUI(); setSync('ok','Data dimuat ✓');
+    $('welcome-dialog').close();
+  }catch(e){err.textContent='Tidak bisa terhubung. Cek koneksi internet lalu coba lagi.';}
+}
+function selesaiWelcome(){ $('welcome-dialog').close(); setSync(cloudState==='err'?'err':'ok'); showTab('setup'); }
+function salinKode(){
+  const k=cfg.kode; if(!k)return;
+  (navigator.clipboard?navigator.clipboard.writeText(k):Promise.reject()).then(()=>toast('Kode disalin ✓')).catch(()=>toast('Kode: '+k));
+}
+async function keluarPerangkat(){
+  if(!cfg.kode){openWelcome();return;}
+  if(!confirm('Keluar dari perangkat ini?\nData di perangkat ini dihapus, tapi tetap aman di cloud. Masuk lagi kapan saja dengan kode '+cfg.kode+'.'))return;
+  clearTimeout(syncTimer); await pushCloud();
+  cfg.kode=''; saveCfg();
+  try{localStorage.removeItem(LS_KEY);}catch(e){}
+  location.reload();
 }
 function load(){
   try{
@@ -945,35 +1013,77 @@ function renderRekap(){
 }
 
 /* ---------- export ---------- */
+const XLSX_SRC='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+function loadXLSX(){
+  if(window.XLSX)return Promise.resolve(window.XLSX);
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');s.src=XLSX_SRC;
+    s.onload=()=>window.XLSX?res(window.XLSX):rej(new Error('xlsx'));
+    s.onerror=()=>rej(new Error('xlsx'));
+    document.head.appendChild(s);
+  });
+}
+const r1=n=>Math.round(n*10)/10;
+function classRows(c){
+  const m=state.meta, nE=state.essay.count;
+  const head=['No','Nama','Jawaban PG','Benar PG','Nilai PG','Jawaban B/S','Benar B/S','Nilai B/S'];
+  for(let i=0;i<nE;i++)head.push('Essay '+(i+1));
+  head.push('Total Essay','Nilai Essay','Nilai Akhir','Status');
+  const rows=[
+    ['Rekap Nilai '+[m.mapel,m.ujian].filter(Boolean).join(' — ')],
+    ['Kelas',c.name],['KKM',Number(m.kkm)],[],head
+  ];
+  c.students.forEach((st,i)=>{
+    if(isPending(st)){rows.push([i+1,st.name,...Array(head.length-3).fill(''),'Belum dikoreksi']);return;}
+    const r=scoreStudent(st);
+    const es=[];for(let j=0;j<nE;j++)es.push(Number(st.essay?.[j]||0));
+    rows.push([i+1,st.name,st.answers||'',r.correct,r1(r.nilaiPG),st.bsAnswers||'',r.bsCorrect,r1(r.nilaiBS),
+      ...es,r1(r.gotEs),r1(r.nilaiES),r1(r.akhir),r.akhir>=m.kkm?'Tuntas':'Belum Tuntas']);
+  });
+  return {rows,headLen:head.length};
+}
+function safeSheetName(name,used){
+  let n=String(name||'Kelas').replace(/[\[\]:*?\/\\]/g,'-').slice(0,31)||'Kelas';
+  let base=n,k=2;while(used.has(n)){n=(base.slice(0,28)+'-'+k++);}
+  used.add(n);return n;
+}
 async function exportCSV(all){
   const m=state.meta;
-  let rows=[['Mapel',m.mapel],['Ujian',m.ujian],['KKM',m.kkm],[],
-    ['Kelas','No','Nama','Jawaban PG','Benar PG','Nilai PG','Jawaban B/S','Benar B/S','Nilai B/S','Skor Essay','Nilai Essay','Nilai Akhir','Status']];
-  const classesToExport=all?state.classes:[cls()];
-  classesToExport.forEach(c=>{
-    c.students.forEach((st,i)=>{
-      if(isPending(st)){rows.push([c.name,i+1,st.name,'','','','','','','','','','Belum dikoreksi']);return;}
-      const r=scoreStudent(st);
-      rows.push([c.name,i+1,st.name,st.answers||'',`${r.correct}/${state.pg.count}`,fmt(r.nilaiPG),st.bsAnswers||'',`${r.bsCorrect}/${state.bs.count}`,fmt(r.nilaiBS),`${fmt(r.gotEs)}/${r.maxEs}`,fmt(r.nilaiES),fmt(r.akhir),r.akhir>=m.kkm?'Tuntas':'Belum Tuntas']);
-    });
-  });
-  const csv=rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(';')).join('\r\n');
-  const data='﻿'+csv;
+  const list=all?state.classes:[cls()];
   const base=all?'rekap-semua-kelas':'rekap-'+cls().name;
-  const filename=(base+(m.ujian?'-'+m.ujian:'')).replace(/[\/\\]/g,'-').replace(/\s+/g,'-').toLowerCase()+'.csv';
-  const blob=new Blob([data],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=filename;
-  a.click(); URL.revokeObjectURL(a.href);
-  toast('CSV terunduh — buka di Excel ✓');
+  const fname=(base+(m.ujian?'-'+m.ujian:'')).replace(/[\/\\]/g,'-').replace(/\s+/g,'-').toLowerCase();
+  try{
+    toast('Menyiapkan file Excel…');
+    const X=await loadXLSX();
+    const wb=X.utils.book_new(), used=new Set();
+    list.forEach(c=>{
+      const {rows,headLen}=classRows(c);
+      const ws=X.utils.aoa_to_sheet(rows);
+      const widths=[5,30,30,9,9,14,10,9];
+      ws['!cols']=Array.from({length:headLen},(_,i)=>({wch:widths[i]||12}));
+      ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:Math.min(headLen-1,8)}}];
+      ws['!autofilter']={ref:X.utils.encode_range({s:{r:4,c:0},e:{r:Math.max(4,rows.length-1),c:headLen-1}})};
+      X.utils.book_append_sheet(wb,ws,safeSheetName(c.name,used));
+    });
+    X.writeFile(wb,fname+'.xlsx');
+    toast('File Excel terunduh ✓');
+  }catch(e){
+    // cadangan saat offline: CSV dengan koma
+    const lines=[];
+    list.forEach(c=>{classRows(c).rows.forEach(r=>lines.push(r));lines.push([]);});
+    const csv=lines.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname+'.csv';
+    a.click();URL.revokeObjectURL(a.href);
+    toast('Sedang offline — diunduh sebagai CSV');
+  }
 }
 
 /* ---------- reset ---------- */
 async function resetAll(){
   if(!confirm('Hapus SEMUA data (pengaturan + semua kelas + semua siswa)?\nTermasuk data di cloud untuk kode sinkronisasi ini.'))return;
   try{localStorage.removeItem(LS_KEY);localStorage.removeItem('penilaian-app-v2');}catch(e){}
-  if(sb&&cfg.kode){try{await sb.from('sinkron_nilai').delete().eq('kode',cfg.kode);}catch(e){}}
+  if(cfg.kode){try{await client().rpc('hapus_data',{p_kode:cfg.kode});}catch(e){} cfg.kode='';saveCfg();}
   location.reload();
 }
 
@@ -991,8 +1101,8 @@ function refreshUI(){
 load();
 refreshUI(); renderHero('setup');
 // isi form sinkronisasi dari konfigurasi tersimpan
-$('cfg-url').value=cfg.url||''; $('cfg-key').value=cfg.key||''; $('cfg-kode').value=cfg.kode||'';
-connectCloud(false);
+setSync(cfg.kode?'saving':'off');
+connectCloud();
 // PWA: service worker untuk pemasangan & offline
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 document.querySelectorAll('.nav-item[data-tab="setup"],.bn-item[data-tab="setup"]').forEach(b=>b.classList.add('active'));
