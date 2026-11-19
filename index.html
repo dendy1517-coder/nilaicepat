@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NilaiCepat — Aplikasi Penilaian PG & Essay</title>
+<meta name="theme-color" content="#0d322c">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#fdeee2;          /* peach frame */
+    --panel:#f4f8f6;         /* app background */
+    --side:#0d322c;          /* dark teal sidebar */
+    --side2:#0a2823;
+    --card:#ffffff;
+    --ink:#122520; --muted:#5f726c; --muted:#5e716b;
+    --teal:#2aa394; --teal-deep:#0f6d60; --teal-soft:#dff1ee;
+    --lime:#cdea5c; --lime-deep:#5d7a0a; --lime-soft:#eef7cf;
+    --green-dark:#114b40;
+    --red:#d64545; --red-soft:#fdecec;
+    --amber:#b97d10; --amber-soft:#fdf3df;
+    --line:#e2eae6;
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Plus Jakarta Sans",system-ui,sans-serif;
+    background:linear-gradient(135deg,#fde4d5 0%,#fdeee2 45%,#d9f0e3 100%);
+    color:var(--ink);font-size:15px;min-height:100vh;padding:18px;
+  }
+  .app{
+    max-width:1280px;margin:0 auto;background:var(--panel);
+    border-radius:26px;overflow:hidden;display:flex;min-height:calc(100vh - 36px);
+    box-shadow:0 30px 70px rgba(13,50,44,.18);
+  }
+  /* ===== SIDEBAR ===== */
+  .side{
+    width:232px;background:var(--side);color:#e8f3ef;flex-shrink:0;
+    display:flex;flex-direction:column;padding:22px 14px;gap:4px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;padding:0 10px 18px;font-weight:800;font-size:17px;color:#fff}
+  .logo .mark{width:34px;height:34px;border-radius:10px;background:var(--lime);display:grid;place-items:center;font-size:17px}
+  .side .group{font-size:11px;font-weight:600;color:#7fa39a;padding:14px 12px 6px}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;
+    color:#c3d8d2;font-weight:600;font-size:14px;cursor:pointer;border:none;background:none;text-align:left;width:100%;
+  }
+  .nav-item svg{width:19px;height:19px;flex-shrink:0}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav-item.active{background:#e9f5ef;color:var(--side)}
+  .side-foot{margin-top:auto;background:var(--teal);border-radius:16px;padding:16px 14px;text-align:center}
+  .side-foot .pic{font-size:26px}
+  .side-foot b{display:block;font-size:13.5px;color:#fff;margin-top:4px}
+  .side-foot span{font-size:11.5px;color:#d7efe9;line-height:1.4;display:block;margin-top:2px}
+  /* ===== CONTENT ===== */
+  .content{flex:1;min-width:0;display:flex;flex-direction:column}
+  .hero{
+    position:relative;background:linear-gradient(100deg,#eaf6ef 0%,#d9efe6 55%,#c9e9db 100%);
+    padding:22px 28px 20px;overflow:hidden;
+  }
+  .hero .date{font-size:12.5px;font-weight:600;color:var(--teal-deep)}
+  .hero h1{margin:4px 0 2px;font-size:26px;font-weight:800;letter-spacing:-.3px}
+  .hero p{margin:0;font-size:13.5px;color:var(--muted);max-width:430px;position:relative;z-index:2}
+  .hero svg.illus{position:absolute;right:10px;bottom:-6px;height:118%;z-index:1;pointer-events:none}
+  .body{padding:22px 28px 90px;flex:1}
+  .screen-title{display:none}
+  /* class bar */
+  .class-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;box-shadow:0 6px 18px rgba(13,50,44,.05)}
+  .class-bar select{max-width:210px;font-weight:700}
+  .mini-btn{padding:8px 13px;font-size:13px}
+  /* cards & forms */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:0 6px 18px rgba(13,50,44,.05)}
+  .card h2{margin:0 0 4px;font-size:16px;font-weight:800;letter-spacing:-.2px}
+  .card .hint{margin:0 0 14px;font-size:13px;color:var(--muted)}
+  label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
+  input[type=text],input[type=number],select,textarea{
+    width:100%;padding:10px 13px;border:1.5px solid var(--line);border-radius:12px;
+    font-size:14px;font-family:inherit;background:#fbfdfc;color:var(--ink)
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px var(--teal-soft)}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:140px}
+  button{border:none;border-radius:999px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn-primary{background:var(--green-dark);color:#fff}
+  .btn-lime{background:var(--lime);color:#2c3a06}
+  .btn-ghost{background:var(--teal-soft);color:var(--teal-deep)}
+  .btn-danger{background:var(--red-soft);color:var(--red)}
+  button:hover{filter:brightness(.95)}
+  .key-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px;margin-top:10px}
+  .key-cell{text-align:center}
+  .key-cell span{display:block;font-size:11px;color:var(--muted);margin-bottom:3px;font-weight:600}
+  .key-cell select,.key-cell input{padding:8px 4px;text-align:center;border-radius:10px}
+  /* tables */
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:9px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+  th{font-size:11.5px;letter-spacing:.03em;color:var(--muted);background:#f3f8f5;position:sticky;top:0;font-weight:700}
+  tr:last-child td{border-bottom:none}
+  .table-wrap{overflow:auto;max-height:480px;border:1px solid var(--line);border-radius:14px}
+  .badge{display:inline-block;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:700}
+  .b-green{background:var(--teal-soft);color:var(--teal-deep)}
+  .b-red{background:var(--red-soft);color:var(--red)}
+  .b-amber{background:var(--amber-soft);color:var(--amber)}
+  .b-grey{background:#edf1ef;color:var(--muted)}
+  .answer-input{font-family:ui-monospace,Consolas,monospace;letter-spacing:3px;text-transform:uppercase}
+  /* stat cards — reference style */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .stat{border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
+  .stat .l{font-size:12px;font-weight:700;opacity:.85}
+  .stat .v{font-size:26px;font-weight:800;margin-top:2px;letter-spacing:-.5px}
+  .stat .ico{position:absolute;right:12px;top:12px;font-size:22px;opacity:.9}
+  .st-lime{background:var(--lime);color:#273605}
+  .st-teal{background:var(--teal);color:#fff}
+  .st-dark{background:var(--green-dark);color:#fff}
+  .st-white{background:var(--card);border:1px solid var(--line);color:var(--ink)}
+  .st-white .l{color:var(--muted)}
+  .essay-inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+  .mini{font-size:12px;color:var(--muted)}
+  .flex-between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .pill-correct{color:var(--teal-deep);font-weight:700}
+  .pill-wrong{color:var(--red);font-weight:700}
+  .detail-ans{font-family:ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:2px}
+  .hidden{display:none}
+  .row-pending td{background:#fffdf0}
+  .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--side);color:#fff;padding:11px 22px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;box-shadow:0 10px 30px rgba(13,50,44,.3)}
+  .toast.show{opacity:1}
+  dialog{border:none;border-radius:20px;padding:22px;max-width:460px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:inherit}
+  dialog::backdrop{background:rgba(10,40,35,.5)}
+  /* bottom nav (mobile) */
+  .bottom-nav{display:none}
+  /* ===== MOBILE ===== */
+  @media (max-width:860px){
+    body{padding:0;background:var(--panel)}
+    .app{border-radius:0;min-height:100vh;box-shadow:none}
+    .side{display:none}
+    .hero{padding:18px 18px 16px}
+    .hero h1{font-size:21px}
+    .hero p{font-size:12.5px;max-width:62%}
+    .hero svg.illus{height:100%;right:-20px;opacity:.9}
+    .body{padding:16px 14px 96px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .stat .v{font-size:22px}
+    th,td{padding:8px 8px}
+    .bottom-nav{
+      display:flex;position:fixed;bottom:0;left:0;right:0;z-index:40;
+      background:var(--side);padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+      justify-content:space-around;border-radius:20px 20px 0 0;box-shadow:0 -8px 24px rgba(13,50,44,.25);
+    }
+    .bn-item{background:none;border:none;color:#9dbcb4;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 16px;border-radius:14px}
+    .bn-item svg{width:21px;height:21px}
+    .bn-item.active{background:var(--lime);color:#273605}
+  }
+  /* ===== TRANSISI (gaya Apple) ===== */
+  :root{--ease:cubic-bezier(.32,.72,0,1);--spring:cubic-bezier(.34,1.56,.64,1)}
+  button,.nav-item,.bn-item{transition:transform .25s var(--ease),filter .25s var(--ease),background-color .25s var(--ease),color .25s var(--ease),box-shadow .25s var(--ease)}
+  button:hover{filter:brightness(.97);transform:translateY(-1px)}
+  button:active,.nav-item:active,.bn-item:active{transform:scale(.96);filter:brightness(.94)}
+  .btn-primary:hover{box-shadow:0 8px 20px rgba(17,75,64,.3)}
+  .btn-lime:hover{box-shadow:0 8px 20px rgba(150,180,30,.35)}
+  .nav-item{transition:background-color .3s var(--ease),color .3s var(--ease),transform .25s var(--ease)}
+  .nav-item:hover{transform:translateX(3px)}
+  .nav-item.active{transform:none}
+  .card{transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+  .card:hover{box-shadow:0 12px 30px rgba(13,50,44,.09)}
+  input[type=text],input[type=number],select,textarea{transition:border-color .25s var(--ease),box-shadow .25s var(--ease),background-color .25s var(--ease)}
+  tbody tr{transition:background-color .25s var(--ease)}
+  tbody tr:hover td{background:#f6faf8}
+  .row-pending:hover td{background:#fdf9e2}
+  /* masuknya konten tab */
+  @keyframes tab-in{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+  section.anim-in{animation:tab-in .5s var(--ease) both}
+  /* hero text ikut berganti halus */
+  @keyframes hero-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .hero.anim-in .date,.hero.anim-in h1,.hero.anim-in p{animation:hero-in .55s var(--ease) both}
+  .hero.anim-in h1{animation-delay:.05s}
+  .hero.anim-in p{animation-delay:.1s}
+  /* kartu statistik masuk berurutan */
+  @keyframes stat-in{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+  .stats .stat{animation:stat-in .55s var(--ease) both}
+  .stats .stat:nth-child(2){animation-delay:.06s}
+  .stats .stat:nth-child(3){animation-delay:.12s}
+  .stats .stat:nth-child(4){animation-delay:.18s}
+  .stats .stat:nth-child(5){animation-delay:.24s}
+  .stat{transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+  .stat:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 12px 26px rgba(13,50,44,.12)}
+  /* toast & dialog ala spring */
+  .toast{transform:translateX(-50%) translateY(14px) scale(.9);transition:opacity .35s var(--spring),transform .35s var(--spring)}
+  .toast.show{transform:translateX(-50%) translateY(0) scale(1)}
+  @keyframes dlg-in{from{opacity:0;transform:scale(.92) translateY(12px)}to{opacity:1;transform:none}}
+  dialog[open]{animation:dlg-in .4s var(--spring) both}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  dialog[open]::backdrop{animation:fade .3s ease both}
+  /* baris baru disorot sebentar */
+  @keyframes row-flash{0%{background:#eef7cf}100%{background:transparent}}
+  tr.just-saved td{animation:row-flash 1.2s var(--ease) both}
+  /* bottom nav aktif memantul halus */
+  @keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+  .bn-item.active{animation:pop .4s var(--spring)}
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .side,.bottom-nav,.hero,.no-print,button,.class-bar{display:none !important}
+    .app{box-shadow:none;border-radius:0}
+    .card,.table-wrap{border:none;box-shadow:none;max-height:none;overflow:visible}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ======= SIDEBAR ======= -->
+  <aside class="side no-print">
+    <div class="logo"><span class="mark">📝</span> NilaiCepat</div>
+    <div class="group">Menu Utama</div>
+    <button class="nav-item" data-tab="setup" onclick="showTab('setup')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Pengaturan & Kunci</button>
+    <button class="nav-item" data-tab="input" onclick="showTab('input')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      Koreksi / Input</button>
+    <button class="nav-item" data-tab="rekap" onclick="showTab('rekap')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg>
+      Rekap Nilai</button>
+    <div class="group">Umum</div>
+    <button class="nav-item" onclick="exportCSV(true)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Unduh Semua (CSV)</button>
+    <button class="nav-item" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Cetak</button>
+    <div class="side-foot">
+      <div class="pic">🎓</div>
+      <b>Koreksi Kilat</b>
+      <span>Ketik jawaban siswa, nilai & rekap jadi otomatis.</span>
+      <span id="sync-status" style="margin-top:8px;font-weight:700">💾 Tersimpan di perangkat ini</span>
+    </div>
+  </aside>
+
+  <!-- ======= CONTENT ======= -->
+  <div class="content">
+    <div class="hero no-print">
+      <svg class="illus" viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- lantai -->
+        <ellipse cx="330" cy="228" rx="260" ry="16" fill="#b7ddcb"/>
+        <!-- papan tulis -->
+        <rect x="300" y="28" width="170" height="110" rx="10" fill="#0f6d60"/>
+        <rect x="308" y="36" width="154" height="94" rx="6" fill="#128272"/>
+        <path d="M322 112 L352 84 L378 100 L412 64 L444 86" stroke="#cdea5c" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="444" cy="86" r="7" fill="#cdea5c"/>
+        <rect x="322" y="48" width="56" height="8" rx="4" fill="#9fd4c9"/>
+        <rect x="378" y="142" width="14" height="70" fill="#0d322c"/>
+        <!-- meja -->
+        <rect x="128" y="150" width="160" height="14" rx="7" fill="#e8a46b"/>
+        <rect x="140" y="164" width="12" height="56" fill="#c97f44"/>
+        <rect x="264" y="164" width="12" height="56" fill="#c97f44"/>
+        <!-- tumpukan buku -->
+        <rect x="150" y="128" width="54" height="10" rx="4" fill="#2aa394"/>
+        <rect x="156" y="118" width="48" height="10" rx="4" fill="#cdea5c"/>
+        <rect x="152" y="108" width="50" height="10" rx="4" fill="#f3c04d"/>
+        <!-- kertas ujian -->
+        <g transform="rotate(-6 236 128)">
+          <rect x="216" y="112" width="44" height="36" rx="5" fill="#ffffff"/>
+          <rect x="222" y="120" width="30" height="4" rx="2" fill="#bcd4cc"/>
+          <rect x="222" y="128" width="24" height="4" rx="2" fill="#bcd4cc"/>
+          <path d="M222 138 l5 5 9-10" stroke="#2aa394" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+        <!-- tanaman -->
+        <rect x="488" y="180" width="30" height="34" rx="6" fill="#e8a46b"/>
+        <path d="M503 180 C498 152 480 148 472 140 C492 142 500 152 503 162 C505 148 514 138 530 134 C520 146 512 158 507 180 Z" fill="#2aa394"/>
+        <path d="M503 178 C505 160 516 154 526 152 C518 162 510 168 507 180 Z" fill="#128272"/>
+        <!-- jam -->
+        <circle cx="258" cy="56" r="22" fill="#ffffff" stroke="#0f6d60" stroke-width="5"/>
+        <path d="M258 44 v12 l9 6" stroke="#0f6d60" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- lencana nilai -->
+        <g transform="rotate(8 150 70)">
+          <rect x="118" y="46" width="64" height="48" rx="10" fill="#cdea5c"/>
+          <text x="150" y="78" text-anchor="middle" font-family="'Plus Jakarta Sans',sans-serif" font-size="24" font-weight="800" fill="#273605">A+</text>
+        </g>
+      </svg>
+      <div class="date"><span id="hero-date">—</span> · <span id="sync-status-hero" style="font-weight:700"></span></div>
+      <h1 id="hero-title">Halo, Selamat Mengoreksi!</h1>
+      <p id="hero-sub">Kunci sudah siap. Ketik jawaban siswa — nilai langsung jadi.</p>
+    </div>
+
+    <div class="body">
+      <!-- pemilih kelas -->
+      <div class="class-bar no-print hidden" id="class-bar">
+        <b>🏫 Kelas:</b>
+        <select id="class-select" onchange="switchClass(this.value)"></select>
+        <button class="btn-ghost mini-btn" onclick="addClasses()">＋ Tambah Kelas</button>
+        <button class="btn-ghost mini-btn" onclick="renameClass()">✏️ Ubah Nama</button>
+        <button class="btn-danger mini-btn" onclick="deleteClass()">🗑️ Hapus</button>
+        <span class="mini" id="class-info"></span>
+      </div>
+
+      <!-- ===== TAB SETUP ===== -->
+      <section id="tab-setup">
+        <div class="card">
+          <h2>Info Penilaian</h2>
+          <div class="row">
+            <div><label>Mata Pelajaran</label><input type="text" id="meta-mapel" placeholder="cth: Informatika"></div>
+            <div><label>Nama Ujian</label><input type="text" id="meta-ujian" placeholder="cth: ASAS 2026/2027"></div>
+            <div><label>KKM</label><input type="number" id="meta-kkm" value="75" min="0" max="100"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>A. Pilihan Ganda</h2>
+          <p class="hint">Kunci bisa diketik sekaligus (cth: <b>ABCDACBD...</b>).</p>
+          <div class="row" style="align-items:flex-end">
+            <div style="max-width:150px"><label>Jumlah Soal PG</label><input type="number" id="pg-count" value="25" min="0" max="100"></div>
+            <div style="max-width:140px"><label>Jumlah Opsi</label>
+              <select id="pg-options"><option value="4">A–D</option><option value="5">A–E</option></select>
+            </div>
+            <div style="max-width:160px"><label>Bobot PG (%)</label><input type="number" id="pg-weight" value="50" min="0" max="100"></div>
+            <div><button class="btn-ghost" onclick="buildKeyGrid()">Terapkan</button></div>
+          </div>
+          <div style="margin-top:12px">
+            <label>Kunci cepat (ketik sekaligus)</label>
+            <input type="text" id="key-fast" class="answer-input" placeholder="ABCDACBDAB" oninput="applyFastKey(this.value)">
+          </div>
+          <div class="key-grid" id="key-grid"></div>
+        </div>
+
+        <div class="card">
+          <h2>B. Benar / Salah</h2>
+          <p class="hint">Ketik sekaligus pakai huruf <b>B</b> (Benar) dan <b>S</b> (Salah), cth: <b>SBBSB...</b></p>
+          <div class="row" style="align-items:flex-end">
+            <div style="max-width:170px"><label>Jumlah Soal B/S</label><input type="number" id="bs-count" value="10" min="0" max="50"></div>
+            <div style="max-width:160px"><label>Bobot B/S (%)</label><input type="number" id="bs-weight" value="20" min="0" max="100"></div>
+            <div><button class="btn-ghost" onclick="buildBSGrid()">Terapkan</button></div>
+          </div>
+          <div style="margin-top:12px">
+            <label>Kunci cepat B/S</label>
+            <input type="text" id="bs-fast" class="answer-input" placeholder="SBBSB" oninput="applyFastBS(this.value)">
+          </div>
+          <div class="key-grid" id="bs-grid"></div>
+        </div>
+
+        <div class="card">
+          <h2>C. Essay</h2>
+          <p class="hint"><b>Bobot essay = 100 − bobot PG − bobot B/S</b> (<span id="es-weight-info"></span>).</p>
+          <div class="row" style="align-items:flex-end">
+            <div style="max-width:160px"><label>Jumlah Soal Essay</label><input type="number" id="es-count" value="5" min="0" max="20"></div>
+            <div><button class="btn-ghost" onclick="buildEssayGrid()">Terapkan</button></div>
+          </div>
+          <div class="key-grid" id="essay-grid"></div>
+        </div>
+
+        <div class="card">
+          <h2>☁️ Sinkronisasi Antar Perangkat</h2>
+          <p class="hint">Isi sekali per perangkat. Pakai <b>kode sinkronisasi yang sama</b> di HP & laptop supaya datanya nyambung. Guru lain pakai kode berbeda → data terpisah.</p>
+          <div class="row">
+            <div style="flex:2;min-width:220px"><label>URL Proyek Supabase</label><input type="text" id="cfg-url" placeholder="https://xxxx.supabase.co"></div>
+            <div style="flex:3;min-width:260px"><label>Kunci Publik (anon key)</label><input type="text" id="cfg-key" placeholder="eyJhbGciOi..."></div>
+            <div style="flex:1.5;min-width:170px"><label>Kode Sinkronisasi</label><input type="text" id="cfg-kode" class="answer-input" style="letter-spacing:1px" placeholder="otomatis jika kosong"></div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-lime" onclick="saveCloudCfg()">🔗 Hubungkan & Sinkron</button>
+            <button class="btn-ghost" onclick="disconnectCloud()">Putuskan</button>
+          </div>
+          <p class="mini" style="margin:10px 0 0">💡 Simpan kode sinkronisasi lu baik-baik — itu "kunci" data lu. Jangan dibagikan ke orang lain.</p>
+        </div>
+
+        <div class="flex-between">
+          <button class="btn-primary" onclick="saveSetup(); showTab('input')">Simpan & Lanjut ke Koreksi →</button>
+          <button class="btn-danger" onclick="resetAll()">Reset Semua Data</button>
+        </div>
+      </section>
+
+      <!-- ===== TAB INPUT ===== -->
+      <section id="tab-input" class="hidden">
+        <div class="card" style="background:var(--lime-soft);border-color:#dcecad">
+          <div class="flex-between">
+            <div><b>⚡ Mulai cepat:</b> <span class="mini">tempel daftar nama siswa (dari Excel/absen), lalu tinggal isi jawabannya.</span></div>
+            <button class="btn-lime" onclick="openImport()">📋 Impor Daftar Nama</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 id="input-title">Input Jawaban</h2>
+          <p class="hint">Ketik nama (atau klik baris siswa di tabel), jawaban PG sekaligus (cth: <b>BCCBA...</b>), jawaban B/S (cth: <b>SBBSB...</b>), pakai <b>-</b> untuk kosong, skor essay, lalu <b>Enter</b>.</p>
+          <div class="row">
+            <div style="flex:2;min-width:180px"><label>Nama Siswa</label><input type="text" id="st-name" placeholder="Nama siswa" list="name-list"><datalist id="name-list"></datalist></div>
+            <div style="flex:2;min-width:200px"><label id="st-ans-label">Jawaban PG</label><input type="text" id="st-ans" class="answer-input" placeholder="BCCBA..."></div>
+            <div style="flex:1.5;min-width:150px"><label id="st-bs-label">Jawaban B/S</label><input type="text" id="st-bs" class="answer-input" placeholder="SBBSB..."></div>
+          </div>
+          <div style="margin-top:10px">
+            <label>Skor Essay</label>
+            <div class="essay-inputs" id="st-essay"></div>
+          </div>
+          <div style="margin-top:14px" class="flex-between">
+            <button class="btn-primary" id="btn-save-student" onclick="saveStudent()">💾 Simpan (Enter)</button>
+            <span class="mini" id="input-status"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex-between">
+            <h2>Daftar Siswa (<span id="count-siswa">0</span>)</h2>
+            <input type="text" id="search" placeholder="🔍 Cari nama..." style="max-width:220px" oninput="renderStudents()">
+          </div>
+          <p class="hint" style="margin-top:6px">Baris kuning = belum dikoreksi. <b>Klik namanya</b> untuk langsung isi jawaban.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Nama</th><th>PG</th><th>B/S</th><th>Nilai PG</th><th>Nilai B/S</th><th>Nilai Essay</th><th>Akhir</th><th>Status</th><th class="no-print">Aksi</th></tr></thead>
+              <tbody id="student-rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TAB REKAP ===== -->
+      <section id="tab-rekap" class="hidden">
+        <div class="card no-print" style="background:var(--teal-soft);border-color:#c3e5df">
+          <div class="flex-between">
+            <div><b id="rekap-title">Rekap Nilai</b><div class="mini" id="rekap-sub"></div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn-lime" onclick="exportCSV(false)">⬇️ CSV Kelas Ini</button>
+              <button class="btn-primary" onclick="exportCSV(true)">⬇️ CSV Semua Kelas</button>
+              <button class="btn-ghost" onclick="window.print()">🖨️ Cetak</button>
+            </div>
+          </div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="card">
+          <h2>Analisis Butir Soal</h2>
+          <p class="hint">Persentase siswa (kelas ini) yang menjawab benar tiap nomor.</p>
+          <div class="table-wrap"><table><thead><tr><th>Bagian</th><th>No</th><th>Kunci</th><th>Benar</th><th>% Benar</th><th>Keterangan</th></tr></thead><tbody id="item-rows"></tbody></table></div>
+        </div>
+        <div class="card">
+          <h2>Peringkat Siswa</h2>
+          <div class="table-wrap"><table><thead><tr><th>Rank</th><th>Nama</th><th>PG</th><th>B/S</th><th>Essay</th><th>Nilai Akhir</th><th>Status</th></tr></thead><tbody id="rank-rows"></tbody></table></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- bottom nav mobile -->
+<nav class="bottom-nav no-print">
+  <button class="bn-item" data-tab="setup" onclick="showTab('setup')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Kunci</button>
+  <button class="bn-item" data-tab="input" onclick="showTab('input')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    Koreksi</button>
+  <button class="bn-item" data-tab="rekap" onclick="showTab('rekap')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg>
+    Rekap</button>
+</nav>
+
+<dialog id="import-dialog">
+  <h2 style="margin:0 0 6px;font-size:16px">📋 Impor Daftar Nama — <span id="import-class"></span></h2>
+  <p class="mini" style="margin:0 0 10px">Tempel nama siswa, <b>satu nama per baris</b> (bisa salin langsung dari kolom Excel/absen). Nomor urut di depan nama akan dibuang otomatis.</p>
+  <textarea id="import-text" rows="10" placeholder="Ahmad Fauzi&#10;Budi Santoso&#10;Citra Lestari"></textarea>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+    <button class="btn-ghost" onclick="$('import-dialog').close()">Batal</button>
+    <button class="btn-primary" onclick="doImport()">Impor</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+'use strict';
+const LS_KEY='penilaian-app-v3';
+/* Default: ASAS Informatika Kelas XI (PG 25, B/S 10, Essay 5 @6 poin) */
+let state={
+  meta:{mapel:'Informatika',ujian:'ASAS 2026/2027',kkm:75},
+  pg:{count:25,options:4,weight:50,key:['B','C','C','B','C','B','B','B','A','A','B','B','B','A','B','A','C','A','A','B','B','B','A','A','B']},
+  bs:{count:10,weight:20,key:['S','B','B','S','B','S','B','B','B','B']},
+  essay:{count:5,max:[6,6,6,6,6]},
+  classes:[{name:'XI A',students:[]}],
+  active:0,
+  editIndex:-1
+};
+
+/* ---------- persistence: lokal + Supabase ---------- */
+/* Opsional: isi dua baris di bawah agar semua perangkat otomatis terhubung
+   tanpa mengisi form koneksi. Ambil dari Supabase: Settings → API. */
+const SUPABASE_URL_DEFAULT='';
+const SUPABASE_KEY_DEFAULT='';
+
+const CFG_KEY='penilaian-cloud-cfg';
+let sb=null, syncTimer=null, lastSynced='', cloudState='off'; // off|ok|err|saving
+let cfg={url:'',key:'',kode:''};
+try{const c=JSON.parse(localStorage.getItem(CFG_KEY)||'{}');cfg={...cfg,...c};}catch(e){}
+if(!cfg.url&&SUPABASE_URL_DEFAULT)cfg.url=SUPABASE_URL_DEFAULT;
+if(!cfg.key&&SUPABASE_KEY_DEFAULT)cfg.key=SUPABASE_KEY_DEFAULT;
+
+function setSync(mode,msg){
+  cloudState=mode;
+  const texts={ok:'☁️ Tersinkron · kode: '+(cfg.kode||'-'),saving:'☁️ Menyimpan…',err:'⚠️ Belum tersinkron',off:'💾 Hanya di perangkat ini'};
+  const side=document.getElementById('sync-status');
+  if(side){
+    side.textContent=texts[mode]||texts.off;
+    side.style.color=mode==='err'?'#ffd9a8':(mode==='off'?'#9dbcb4':'#bfe8d6');
+  }
+  const hero=document.getElementById('sync-status-hero');
+  if(hero){
+    hero.textContent=(texts[mode]||texts.off).split(' · ')[0];
+    hero.style.color=mode==='err'?'#b97d10':'inherit';
+  }
+  if(msg)toast(msg);
+}
+function snapshotPayload(){
+  return {meta:state.meta,pg:state.pg,bs:state.bs,essay:state.essay,classes:state.classes,active:state.active,savedAt:Date.now()};
+}
+function save(){
+  state.savedAt=Date.now();
+  try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}
+  if(sb){clearTimeout(syncTimer);syncTimer=setTimeout(pushCloud,1500);}
+}
+async function pushCloud(){
+  if(!sb||!cfg.kode)return;
+  const payload=snapshotPayload();
+  const str=JSON.stringify({...payload,savedAt:0});
+  if(str===lastSynced)return;
+  setSync('saving');
+  try{
+    const {error}=await sb.from('sinkron_nilai').upsert({kode:cfg.kode,data:payload,updated_at:new Date().toISOString()});
+    if(error)throw error;
+    lastSynced=str; setSync('ok');
+  }catch(e){setSync('err');}
+}
+function applyCloudState(d){
+  state={...state,
+    meta:d.meta||state.meta,pg:d.pg||state.pg,bs:d.bs||state.bs,essay:d.essay||state.essay,
+    classes:(d.classes&&d.classes.length)?d.classes:state.classes,
+    active:Math.min(d.active||0,(d.classes?.length||1)-1),editIndex:-1};
+  try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}
+}
+async function connectCloud(interactive){
+  if(!cfg.url||!cfg.key||!cfg.kode){setSync('off');return;}
+  if(!window.supabase){setSync('err');if(interactive)toast('Pustaka Supabase belum termuat — cek koneksi internet');return;}
+  try{
+    if(!sb) sb=window.supabase.createClient(cfg.url,cfg.key);
+    const {data,error}=await sb.from('sinkron_nilai').select('data').eq('kode',cfg.kode).maybeSingle();
+    if(error)throw error;
+    const d=data&&data.data;
+    const localHas=state.classes.some(c=>c.students.length);
+    if(d&&d.classes&&d.classes.length){
+      const cloudNewer=(d.savedAt||0)>=(getLocalSavedAt());
+      if(cloudNewer||!localHas){
+        applyCloudState(d);
+        lastSynced=JSON.stringify({...snapshotPayload(),savedAt:0});
+        refreshUI();
+        setSync('ok',interactive?'☁️ Terhubung — data dimuat dari cloud ✓':null);
+      }else{
+        setSync('ok',interactive?'☁️ Terhubung — data perangkat ini lebih baru, akan disinkron':null);
+        save();
+      }
+    }else{
+      setSync('ok');
+      await pushCloud();
+      if(cloudState==='ok'&&interactive)toast('☁️ Terhubung — data dikirim ke cloud ✓');
+    }
+  }catch(e){setSync('err');if(interactive)toast('Gagal terhubung — cek URL, kunci, dan tabel Supabase');}
+}
+function getLocalSavedAt(){return state.savedAt||0;}
+function saveCloudCfg(){
+  const url=$('cfg-url').value.trim().replace(/\/+$/,'');
+  const key=$('cfg-key').value.trim();
+  let kode=$('cfg-kode').value.trim().toUpperCase().replace(/\s+/g,'-');
+  if(!url||!key){toast('Isi URL dan kunci (anon key) Supabase dulu');return;}
+  if(!kode){kode='GURU-'+Math.random().toString(36).slice(2,8).toUpperCase();$('cfg-kode').value=kode;}
+  cfg={url,key,kode}; sb=null;
+  try{localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}catch(e){}
+  connectCloud(true);
+}
+function disconnectCloud(){
+  if(!confirm('Putuskan sinkronisasi di perangkat ini? Data tetap aman di cloud & perangkat.'))return;
+  cfg={...cfg,kode:''}; sb=null;
+  try{localStorage.setItem(CFG_KEY,JSON.stringify(cfg));}catch(e){}
+  setSync('off','Sinkronisasi diputus');
+}
+function load(){
+  try{
+    let s=localStorage.getItem(LS_KEY);
+    if(s){const p=JSON.parse(s); if(p&&p.classes&&p.classes.length){state={...state,...p,editIndex:-1}; return;}}
+    s=localStorage.getItem('penilaian-app-v2');
+    if(s){const p=JSON.parse(s);
+      if(p&&p.pg){state={...state,meta:{mapel:p.meta?.mapel||'Informatika',ujian:p.meta?.ujian||'ASAS 2026/2027',kkm:p.meta?.kkm||75},pg:p.pg,bs:p.bs||state.bs,essay:p.essay||state.essay,
+        classes:[{name:p.meta?.kelas||'XI A',students:p.students||[]}],active:0,editIndex:-1}; save();}
+    }
+  }catch(e){}
+}
+
+/* ---------- helpers ---------- */
+function $(id){return document.getElementById(id);}
+function cls(){return state.classes[state.active];}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('show'),1900);}
+function letters(n){return ['A','B','C','D','E'].slice(0,n);}
+function fmt(n){return (Math.round(n*10)/10).toString().replace('.',',');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function isPending(st){
+  const noAns=!(st.answers||'').replace(/-/g,'') && !(st.bsAnswers||'').replace(/-/g,'');
+  const noEs=!(st.essay||[]).some(v=>v>0);
+  return noAns&&noEs;
+}
+
+/* ---------- hero ---------- */
+function renderHero(tab){
+  const hari=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const bulan=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const d=new Date();
+  $('hero-date').textContent=`${hari[d.getDay()]}, ${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+  const titles={
+    setup:['Siapkan Kunci Jawaban','Atur kunci, bobot, dan jumlah soal.'],
+    input:['Halo, Selamat Mengoreksi!','Ketik jawaban siswa — nilai langsung jadi.'],
+    rekap:['Rekap & Analisis','Rata-rata, peringkat, dan soal tersulit sekelas.']
+  };
+  const t=titles[tab]||titles.input;
+  $('hero-title').textContent=t[0]; $('hero-sub').textContent=t[1];
+}
+
+/* ---------- kelas ---------- */
+function renderClassBar(){
+  const sel=$('class-select'); sel.innerHTML='';
+  state.classes.forEach((c,i)=>{
+    const done=c.students.filter(s=>!isPending(s)).length;
+    sel.innerHTML+=`<option value="${i}" ${i===state.active?'selected':''}>${esc(c.name)} (${done}/${c.students.length})</option>`;
+  });
+  const c=cls();
+  const done=c.students.filter(s=>!isPending(s)).length;
+  $('class-info').textContent=`${done} dari ${c.students.length} siswa sudah dikoreksi`;
+  $('input-title').textContent='Input Jawaban — Kelas '+c.name;
+}
+function switchClass(i){
+  state.active=parseInt(i)||0; state.editIndex=-1;
+  $('btn-save-student').textContent='💾 Simpan (Enter)';
+  clearForm(); save(); renderClassBar(); renderStudents();
+  if(!$('tab-rekap').classList.contains('hidden'))renderRekap();
+}
+function addClasses(){
+  const v=prompt('Nama kelas baru (boleh beberapa sekaligus, pisahkan dengan koma):\ncth: XI B, XI C, XI D');
+  if(!v)return;
+  const names=v.split(',').map(s=>s.trim()).filter(Boolean);
+  names.forEach(n=>{if(!state.classes.some(c=>c.name.toLowerCase()===n.toLowerCase()))state.classes.push({name:n,students:[]});});
+  state.active=state.classes.length-1;
+  save(); renderClassBar(); renderStudents(); toast(names.length+' kelas ditambahkan ✓');
+}
+function renameClass(){
+  const v=prompt('Nama baru untuk kelas "'+cls().name+'":',cls().name);
+  if(!v)return; cls().name=v.trim()||cls().name; save(); renderClassBar();
+}
+function deleteClass(){
+  if(state.classes.length<=1){toast('Minimal harus ada satu kelas');return;}
+  if(!confirm('Hapus kelas "'+cls().name+'" beserta '+cls().students.length+' data siswanya?'))return;
+  state.classes.splice(state.active,1); state.active=0; state.editIndex=-1;
+  save(); renderClassBar(); renderStudents(); toast('Kelas dihapus');
+}
+
+/* ---------- impor nama ---------- */
+function openImport(){ $('import-class').textContent='Kelas '+cls().name; $('import-text').value=''; $('import-dialog').showModal(); }
+function doImport(){
+  const lines=$('import-text').value.split('\n').map(l=>l.replace(/^\s*\d+[\.\)\t ]*/,'').trim()).filter(Boolean);
+  if(!lines.length){toast('Tidak ada nama yang bisa diimpor');return;}
+  let added=0;
+  lines.forEach(name=>{
+    if(!cls().students.some(s=>s.name.toLowerCase()===name.toLowerCase())){
+      cls().students.push({name,answers:'',bsAnswers:'',essay:[]}); added++;
+    }
+  });
+  save(); $('import-dialog').close(); renderClassBar(); renderStudents();
+  toast(added+' siswa diimpor ke '+cls().name+' ✓');
+}
+
+/* ---------- tabs ---------- */
+function showTab(name){
+  ['setup','input','rekap'].forEach(t=>{
+    const el=$('tab-'+t);
+    el.classList.toggle('hidden',t!==name);
+    el.classList.remove('anim-in');
+  });
+  const act=$('tab-'+name); void act.offsetWidth; act.classList.add('anim-in');
+  const hero=document.querySelector('.hero');
+  if(hero){hero.classList.remove('anim-in'); void hero.offsetWidth; hero.classList.add('anim-in');}
+  document.querySelectorAll('.nav-item[data-tab],.bn-item[data-tab]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.tab===name);
+  });
+  $('class-bar').classList.toggle('hidden',name==='setup');
+  renderHero(name);
+  if(name==='input'){renderClassBar();buildStudentEssayInputs();renderStudents();if(window.innerWidth>860)$('st-name').focus();}
+  if(name==='rekap'){renderClassBar();renderRekap();}
+}
+
+/* ---------- setup: PG ---------- */
+function buildKeyGrid(){
+  const count=Math.max(0,Math.min(100,parseInt($('pg-count').value)||0));
+  const opts=parseInt($('pg-options').value)||4;
+  state.pg.count=count; state.pg.options=opts;
+  state.pg.key.length=count;
+  const grid=$('key-grid'); grid.innerHTML='';
+  const ls=letters(opts);
+  for(let i=0;i<count;i++){
+    const cell=document.createElement('div'); cell.className='key-cell';
+    const sel=document.createElement('select');
+    sel.innerHTML='<option value="">—</option>'+ls.map(l=>`<option>${l}</option>`).join('');
+    sel.value=state.pg.key[i]||'';
+    sel.onchange=()=>{state.pg.key[i]=sel.value;syncFastKey();save();};
+    cell.innerHTML=`<span>No. ${i+1}</span>`; cell.appendChild(sel); grid.appendChild(cell);
+  }
+  syncFastKey(); updateWeightInfo(); save();
+}
+function syncFastKey(){ $('key-fast').value=(state.pg.key||[]).map(k=>k||'-').join('').replace(/-+$/,''); }
+function applyFastKey(v){
+  const ls=letters(state.pg.options);
+  const chars=v.toUpperCase().replace(/[^A-E\-]/g,'');
+  for(let i=0;i<state.pg.count;i++){
+    const c=chars[i]||'';
+    state.pg.key[i]=ls.includes(c)?c:'';
+  }
+  $('key-grid').querySelectorAll('select').forEach((s,i)=>s.value=state.pg.key[i]||'');
+  save();
+}
+
+/* ---------- setup: B/S ---------- */
+function buildBSGrid(){
+  const count=Math.max(0,Math.min(50,parseInt($('bs-count').value)||0));
+  state.bs.count=count;
+  state.bs.key.length=count;
+  const grid=$('bs-grid'); grid.innerHTML='';
+  for(let i=0;i<count;i++){
+    const cell=document.createElement('div'); cell.className='key-cell';
+    const sel=document.createElement('select');
+    sel.innerHTML='<option value="">—</option><option value="B">Benar</option><option value="S">Salah</option>';
+    sel.value=state.bs.key[i]||'';
+    sel.onchange=()=>{state.bs.key[i]=sel.value;syncFastBS();save();};
+    cell.innerHTML=`<span>No. ${i+1}</span>`; cell.appendChild(sel); grid.appendChild(cell);
+  }
+  syncFastBS(); updateWeightInfo(); save();
+}
+function syncFastBS(){ $('bs-fast').value=(state.bs.key||[]).map(k=>k||'-').join('').replace(/-+$/,''); }
+function applyFastBS(v){
+  const chars=v.toUpperCase().replace(/[^BS\-]/g,'');
+  for(let i=0;i<state.bs.count;i++){
+    const c=chars[i]||'';
+    state.bs.key[i]=(c==='B'||c==='S')?c:'';
+  }
+  $('bs-grid').querySelectorAll('select').forEach((s,i)=>s.value=state.bs.key[i]||'');
+  save();
+}
+
+/* ---------- setup: Essay ---------- */
+function buildEssayGrid(){
+  const count=Math.max(0,Math.min(20,parseInt($('es-count').value)||0));
+  state.essay.count=count;
+  state.essay.max.length=count;
+  const grid=$('essay-grid'); grid.innerHTML='';
+  for(let i=0;i<count;i++){
+    if(!state.essay.max[i]) state.essay.max[i]=10;
+    const cell=document.createElement('div'); cell.className='key-cell';
+    const inp=document.createElement('input'); inp.type='number'; inp.min=1; inp.value=state.essay.max[i];
+    inp.onchange=()=>{state.essay.max[i]=Math.max(1,parseInt(inp.value)||1);save();};
+    cell.innerHTML=`<span>Skor Maks No. ${i+1}</span>`; cell.appendChild(inp); grid.appendChild(cell);
+  }
+  updateWeightInfo(); save();
+}
+function weights(){
+  const wPG=state.pg.count>0?state.pg.weight:0;
+  const wBS=state.bs.count>0?state.bs.weight:0;
+  const wES=state.essay.count>0?Math.max(0,100-wPG-wBS):0;
+  return {wPG,wBS,wES,total:(wPG+wBS+wES)||1};
+}
+function updateWeightInfo(){
+  const w=weights();
+  const el=$('es-weight-info'); if(el) el.textContent=`saat ini: PG ${w.wPG}% + B/S ${w.wBS}% + Essay ${w.wES}%`;
+}
+function saveSetup(){
+  state.meta={mapel:$('meta-mapel').value.trim(),ujian:$('meta-ujian').value.trim(),kkm:parseFloat($('meta-kkm').value)||75};
+  state.pg.weight=Math.max(0,Math.min(100,parseFloat($('pg-weight').value)||0));
+  state.bs.weight=Math.max(0,Math.min(100,parseFloat($('bs-weight').value)||0));
+  buildKeyGrid(); buildBSGrid(); buildEssayGrid();
+  save(); toast('Pengaturan tersimpan ✓ (berlaku semua kelas)');
+}
+
+/* ---------- scoring ---------- */
+function scoreStudent(st){
+  const key=state.pg.key, bsKey=state.bs.key;
+  let correct=0;
+  for(let i=0;i<state.pg.count;i++){ if(key[i] && (st.answers||'')[i]===key[i]) correct++; }
+  let bsCorrect=0;
+  for(let i=0;i<state.bs.count;i++){ if(bsKey[i] && (st.bsAnswers||'')[i]===bsKey[i]) bsCorrect++; }
+  const pgPct=state.pg.count>0?correct/state.pg.count:0;
+  const bsPct=state.bs.count>0?bsCorrect/state.bs.count:0;
+  const maxEs=state.essay.max.slice(0,state.essay.count).reduce((a,b)=>a+(b||0),0);
+  const gotEs=(st.essay||[]).slice(0,state.essay.count).reduce((a,b)=>a+(parseFloat(b)||0),0);
+  const esPct=maxEs>0?Math.min(1,gotEs/maxEs):0;
+  const w=weights();
+  const akhir=(pgPct*w.wPG+bsPct*w.wBS+esPct*w.wES)/w.total*100;
+  return {correct,bsCorrect,nilaiPG:pgPct*100,nilaiBS:bsPct*100,nilaiES:esPct*100,akhir,gotEs,maxEs};
+}
+
+/* ---------- input ---------- */
+function buildStudentEssayInputs(){
+  const wrap=$('st-essay'); wrap.innerHTML='';
+  if(state.essay.count===0){wrap.innerHTML='<span class="mini">Tidak ada soal essay.</span>';}
+  for(let i=0;i<state.essay.count;i++){
+    const cell=document.createElement('div'); cell.className='key-cell';
+    const inp=document.createElement('input'); inp.type='number'; inp.min=0; inp.max=state.essay.max[i];
+    inp.placeholder='0–'+state.essay.max[i]; inp.dataset.es=i; inp.className='es-in';
+    cell.innerHTML=`<span>No. ${i+1} (maks ${state.essay.max[i]})</span>`; cell.appendChild(inp); wrap.appendChild(cell);
+  }
+  $('st-ans-label').textContent=`Jawaban PG (${state.pg.count} soal)`;
+  $('st-bs-label').textContent=`Jawaban B/S (${state.bs.count} soal)`;
+}
+function clearForm(){
+  $('st-name').value='';$('st-ans').value='';$('st-bs').value='';
+  document.querySelectorAll('.es-in').forEach(i=>i.value='');
+}
+function saveStudent(){
+  const name=$('st-name').value.trim();
+  if(!name){toast('Nama siswa belum diisi');$('st-name').focus();return;}
+  let ans=$('st-ans').value.toUpperCase().replace(/[^A-E\-]/g,'');
+  if(state.pg.count>0 && ans.length>0 && ans.length<state.pg.count) ans=ans.padEnd(state.pg.count,'-');
+  ans=ans.slice(0,state.pg.count);
+  let bsAns=$('st-bs').value.toUpperCase().replace(/[^BS\-]/g,'');
+  if(state.bs.count>0 && bsAns.length>0 && bsAns.length<state.bs.count) bsAns=bsAns.padEnd(state.bs.count,'-');
+  bsAns=bsAns.slice(0,state.bs.count);
+  const essay=[...document.querySelectorAll('.es-in')].map((inp,i)=>{
+    let v=parseFloat(inp.value)||0;
+    return Math.max(0,Math.min(state.essay.max[i]||0,v));
+  });
+  const st={name,answers:ans,bsAnswers:bsAns,essay};
+  const students=cls().students;
+  if(state.editIndex>=0){
+    students[state.editIndex]=st;state.editIndex=-1;
+    $('btn-save-student').textContent='💾 Simpan (Enter)';toast('✓ '+name+' diperbarui');
+  }else{
+    const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
+    if(idx>=0){students[idx]=st;toast('✓ '+name+' dikoreksi');}
+    else{students.push(st);toast('✓ '+name+' ditambahkan');}
+  }
+  save(); clearForm(); renderClassBar(); renderStudents(); $('st-name').focus();
+  // sorot baris yang baru disimpan
+  const rows=[...document.querySelectorAll('#student-rows tr')];
+  const hit=rows.find(tr=>tr.querySelector('td:nth-child(2) b')?.textContent===name);
+  if(hit){hit.classList.add('just-saved');hit.scrollIntoView({block:'nearest',behavior:'smooth'});}
+}
+function editStudent(i){
+  const st=cls().students[i]; state.editIndex=i;
+  $('st-name').value=st.name;
+  $('st-ans').value=(st.answers||'').replace(/-+$/,'');
+  $('st-bs').value=(st.bsAnswers||'').replace(/-+$/,'');
+  document.querySelectorAll('.es-in').forEach((inp,j)=>inp.value=st.essay?.[j]??'');
+  $('btn-save-student').textContent='✏️ Perbarui: '+st.name;
+  $('st-ans').focus(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function delStudent(i){
+  if(!confirm('Hapus data "'+cls().students[i].name+'"?'))return;
+  cls().students.splice(i,1); if(state.editIndex===i)state.editIndex=-1;
+  save(); renderClassBar(); renderStudents(); toast('Data dihapus');
+}
+function badge(akhir){
+  return akhir>=state.meta.kkm?'<span class="badge b-green">Tuntas</span>':'<span class="badge b-red">Belum Tuntas</span>';
+}
+function marked(ansStr,keyArr){
+  return [...(ansStr||'')].map((c,i)=>{
+    if(!keyArr[i])return c;
+    return c===keyArr[i]?`<span class="pill-correct">${c}</span>`:`<span class="pill-wrong">${c==='-'?'·':c}</span>`;
+  }).join('');
+}
+function renderStudents(){
+  const q=($('search').value||'').toLowerCase();
+  const tb=$('student-rows'); tb.innerHTML='';
+  const dl=$('name-list'); dl.innerHTML='';
+  let shown=0;
+  cls().students.forEach((st,i)=>{
+    dl.innerHTML+=`<option value="${esc(st.name)}">`;
+    if(q && !st.name.toLowerCase().includes(q))return;
+    shown++;
+    const pending=isPending(st);
+    const r=scoreStudent(st);
+    const tr=document.createElement('tr');
+    if(pending)tr.className='row-pending';
+    tr.innerHTML=`<td>${i+1}</td>
+      <td><b style="cursor:pointer;color:var(--teal-deep)" onclick="editStudent(${i})">${esc(st.name)}</b></td>`+
+      (pending
+        ?`<td colspan="6"><span class="badge b-grey">Belum dikoreksi — klik nama untuk isi</span></td>`
+        :`<td class="detail-ans">${marked(st.answers,state.pg.key)}<div class="mini">${r.correct}/${state.pg.count}</div></td>
+          <td class="detail-ans">${marked(st.bsAnswers,state.bs.key)}<div class="mini">${r.bsCorrect}/${state.bs.count}</div></td>
+          <td>${fmt(r.nilaiPG)}</td>
+          <td>${fmt(r.nilaiBS)}</td>
+          <td>${fmt(r.nilaiES)} <span class="mini">(${fmt(r.gotEs)}/${r.maxEs})</span></td>
+          <td><b>${fmt(r.akhir)}</b></td>`)+
+      `<td>${pending?'<span class="badge b-amber">Menunggu</span>':badge(r.akhir)}</td>
+      <td class="no-print" style="white-space:nowrap">
+        <button class="btn-ghost" style="padding:5px 10px" onclick="editStudent(${i})">✏️</button>
+        <button class="btn-danger" style="padding:5px 10px" onclick="delStudent(${i})">🗑️</button>
+      </td>`;
+    tb.appendChild(tr);
+  });
+  $('count-siswa').textContent=cls().students.length+(q?` · tampil ${shown}`:'');
+}
+
+/* ---------- rekap ---------- */
+function renderRekap(){
+  const m=state.meta, c=cls();
+  $('rekap-title').textContent=['Rekap Nilai',m.ujian,'— Kelas '+c.name].filter(Boolean).join(' ');
+  $('rekap-sub').textContent=[m.mapel,'KKM '+m.kkm].filter(Boolean).join(' · ');
+  const scored=c.students.filter(s=>!isPending(s)).map(st=>({st,r:scoreStudent(st)}));
+  const n=scored.length;
+  const avg=n?scored.reduce((a,x)=>a+x.r.akhir,0)/n:0;
+  const max=n?Math.max(...scored.map(x=>x.r.akhir)):0;
+  const min=n?Math.min(...scored.map(x=>x.r.akhir)):0;
+  const tuntas=scored.filter(x=>x.r.akhir>=state.meta.kkm).length;
+  $('stats').innerHTML=`
+    <div class="stat st-white"><div class="l">Dikoreksi</div><div class="v">${n}<span class="mini">/${c.students.length}</span></div><div class="ico">🗂️</div></div>
+    <div class="stat st-lime"><div class="l">Rata-rata Kelas</div><div class="v">${fmt(avg)}</div><div class="ico">📊</div></div>
+    <div class="stat st-teal"><div class="l">Nilai Tertinggi</div><div class="v">${fmt(max)}</div><div class="ico">🏆</div></div>
+    <div class="stat st-white"><div class="l">Nilai Terendah</div><div class="v">${fmt(min)}</div><div class="ico">📉</div></div>
+    <div class="stat st-dark"><div class="l">Tuntas (≥ KKM)</div><div class="v">${tuntas}/${n}</div><div class="ico">✅</div></div>`;
+  const tb=$('item-rows'); tb.innerHTML='';
+  const graded=scored.map(x=>x.st);
+  function itemRow(bagian,no,key,benar){
+    const pct=n?benar/n*100:0;
+    let ket,kcls;
+    if(!n){ket='—';kcls='b-amber';}
+    else if(pct>=70){ket='Mudah / dikuasai';kcls='b-green';}
+    else if(pct>=40){ket='Sedang';kcls='b-amber';}
+    else{ket='Sulit — perlu dibahas';kcls='b-red';}
+    tb.innerHTML+=`<tr><td>${bagian}</td><td>${no}</td><td><b>${key||'—'}</b></td><td>${benar}/${n}</td><td>${fmt(pct)}%</td><td><span class="badge ${kcls}">${ket}</span></td></tr>`;
+  }
+  for(let i=0;i<state.pg.count;i++){
+    const benar=graded.filter(st=>state.pg.key[i]&&(st.answers||'')[i]===state.pg.key[i]).length;
+    itemRow('PG',i+1,state.pg.key[i],benar);
+  }
+  for(let i=0;i<state.bs.count;i++){
+    const benar=graded.filter(st=>state.bs.key[i]&&(st.bsAnswers||'')[i]===state.bs.key[i]).length;
+    itemRow('B/S',i+1,state.bs.key[i]==='B'?'Benar':state.bs.key[i]==='S'?'Salah':'',benar);
+  }
+  const rb=$('rank-rows'); rb.innerHTML='';
+  scored.slice().sort((a,b)=>b.r.akhir-a.r.akhir).forEach((x,i)=>{
+    rb.innerHTML+=`<tr><td>${i+1}</td><td><b>${esc(x.st.name)}</b></td><td>${fmt(x.r.nilaiPG)}</td><td>${fmt(x.r.nilaiBS)}</td><td>${fmt(x.r.nilaiES)}</td><td><b>${fmt(x.r.akhir)}</b></td><td>${badge(x.r.akhir)}</td></tr>`;
+  });
+}
+
+/* ---------- export ---------- */
+async function exportCSV(all){
+  const m=state.meta;
+  let rows=[['Mapel',m.mapel],['Ujian',m.ujian],['KKM',m.kkm],[],
+    ['Kelas','No','Nama','Jawaban PG','Benar PG','Nilai PG','Jawaban B/S','Benar B/S','Nilai B/S','Skor Essay','Nilai Essay','Nilai Akhir','Status']];
+  const classesToExport=all?state.classes:[cls()];
+  classesToExport.forEach(c=>{
+    c.students.forEach((st,i)=>{
+      if(isPending(st)){rows.push([c.name,i+1,st.name,'','','','','','','','','','Belum dikoreksi']);return;}
+      const r=scoreStudent(st);
+      rows.push([c.name,i+1,st.name,st.answers||'',`${r.correct}/${state.pg.count}`,fmt(r.nilaiPG),st.bsAnswers||'',`${r.bsCorrect}/${state.bs.count}`,fmt(r.nilaiBS),`${fmt(r.gotEs)}/${r.maxEs}`,fmt(r.nilaiES),fmt(r.akhir),r.akhir>=m.kkm?'Tuntas':'Belum Tuntas']);
+    });
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(';')).join('\r\n');
+  const data='﻿'+csv;
+  const base=all?'rekap-semua-kelas':'rekap-'+cls().name;
+  const filename=(base+(m.ujian?'-'+m.ujian:'')).replace(/[\/\\]/g,'-').replace(/\s+/g,'-').toLowerCase()+'.csv';
+  const blob=new Blob([data],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('CSV terunduh — buka di Excel ✓');
+}
+
+/* ---------- reset ---------- */
+async function resetAll(){
+  if(!confirm('Hapus SEMUA data (pengaturan + semua kelas + semua siswa)?\nTermasuk data di cloud untuk kode sinkronisasi ini.'))return;
+  try{localStorage.removeItem(LS_KEY);localStorage.removeItem('penilaian-app-v2');}catch(e){}
+  if(sb&&cfg.kode){try{await sb.from('sinkron_nilai').delete().eq('kode',cfg.kode);}catch(e){}}
+  location.reload();
+}
+
+/* ---------- init ---------- */
+function refreshUI(){
+  $('meta-mapel').value=state.meta.mapel;
+  $('meta-ujian').value=state.meta.ujian; $('meta-kkm').value=state.meta.kkm;
+  $('pg-count').value=state.pg.count; $('pg-options').value=state.pg.options; $('pg-weight').value=state.pg.weight;
+  $('bs-count').value=state.bs.count; $('bs-weight').value=state.bs.weight;
+  $('es-count').value=state.essay.count;
+  buildKeyGrid(); buildBSGrid(); buildEssayGrid(); renderClassBar();
+  if(!$('tab-input').classList.contains('hidden')){buildStudentEssayInputs();renderStudents();}
+  if(!$('tab-rekap').classList.contains('hidden'))renderRekap();
+}
+load();
+refreshUI(); renderHero('setup');
+// isi form sinkronisasi dari konfigurasi tersimpan
+$('cfg-url').value=cfg.url||''; $('cfg-key').value=cfg.key||''; $('cfg-kode').value=cfg.kode||'';
+connectCloud(false);
+// PWA: service worker untuk pemasangan & offline
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+document.querySelectorAll('.nav-item[data-tab="setup"],.bn-item[data-tab="setup"]').forEach(b=>b.classList.add('active'));
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter' || $('tab-input').classList.contains('hidden'))return;
+  if($('import-dialog').open)return;
+  const a=document.activeElement;
+  if(['st-name','st-ans','st-bs'].includes(a.id)||a.classList?.contains('es-in')){
+    e.preventDefault(); saveStudent();
+  }
+});
+</script>
+</body>
+</html>
